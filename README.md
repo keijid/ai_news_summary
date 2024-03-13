@@ -21,10 +21,31 @@ AI News Summaryは、人工知能に関するニュース記事を自動的に�
 
 ## セットアップ
 
-1. Google Cloud Functionsを設定し、`main.py`をデプロイします。
-2. OpenAI APIキーとSlack Incoming Webhook URLを環境変数として設定します。
-3. Google Cloud Pub/Subトピックを作成します。
+1. OpenAI APIキーとSlack Incoming Webhook URLを環境変数として設定します。
+- `YOUR_OPENAI_API_KEY`をあなたのOpenAI APIキーに置き換えてください。
+- `YOUR_SLACK_WEBHOOK_URL`をあなたのSlack Incoming Webhook URLに置き換えてください
+
+2. Google Cloud Pub/Subトピックを作成します。
+```
+gcloud pubsub topics create news_summary_topic
+```
+
+3. Google Cloud Functionsを設定し、`main.py`をデプロイします。
+```CLI
+gcloud functions deploy news_summary --runtime python310 --trigger-topic news_summary_topic --set-env-vars OPENAI_API_KEY=YOUR_OPENAI_API_KEY,SLACK_WEBHOOK_URL=YOUR_SLACK_WEBHOOK_URL
+```
+
 4. Google Cloud SchedulerにCron jobを設定し、Pub/Subトピックにメッセージを発行します。
+- Google Cloud Consoleで、Cloud Schedulerのページに移動します。
+- 「ジョブを作成」をクリックし、必要な情報を入力します。
+  - 名前：ジョブの名前を入力
+  - 説明：ジョブの説明を入力
+  - 頻度：Cron式で実行頻度を指定（例：`0 9 * * *`）
+  - タイムゾーン：適切なタイムゾーンを選択
+  - ターゲット：Pub/Subを選択
+  - トピック：`news_summary_topic`を選択
+  - ペイロード：任意のテキスト
+- 「作成」をクリックしてジョブを作成します。
 
 ## ファイル構成
 

@@ -10,6 +10,28 @@ AI News Summaryは、人工知能に関するニュース記事を自動的に�
 - OpenAI APIを使用して、各記事の要約を生成
 - 生成された要約をSlackチャンネルに通知
 
+## アーキテクチャ
+
+このプロジェクトのアーキテクチャ図は以下の通りです。
+
+```mermaid
+graph LR
+    A[Cloud Scheduler] --> B{Pub/Sub Topic}
+    B --> C[Cloud Function]
+    C --> D[RSS Feed]
+    C --> E[OpenAI API]
+    C --> F[Slack Incoming Webhook]
+    E --> C
+    C --> G[Slack Channel]
+```
+
+1. Cloud SchedulerがPub/Subトピックにメッセージをパブリッシュします。
+2. Pub/SubトピックがCloud Functionsにメッセージを送信します。
+3. Cloud FunctionsがRSS Feedからニュース記事を取得します。
+4. Cloud FunctionsがOpenAI APIを使用してニュース記事を要約します。
+5. Cloud FunctionsがSlack Incoming Webhookを使用して要約をSlackチャンネルに送信します。
+6. Slackチャンネルに要約が表示されます。
+
 ## 使用技術
 
 - Python
